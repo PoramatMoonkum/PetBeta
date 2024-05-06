@@ -37,7 +37,7 @@ class _MenuViewState extends State<PetOwnerView> {
                       child: Text(
                         "ผู้รับฝาก",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: const Color.fromARGB(255, 161, 74, 74),
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           
