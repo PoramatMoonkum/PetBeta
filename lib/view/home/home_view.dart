@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pettakecare/common/color_extension.dart';
 import 'package:pettakecare/common_widget/round_textfield.dart';
+import 'package:pettakecare/view/more/notifications.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -37,7 +38,11 @@ class _HomeViewState extends State<HomeView> {
                             fontWeight: FontWeight.w800),
                       ),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => NotificationsView()));},
                         icon: Image.asset(
                           "assets/img/more_notification.png",
                           width: 25,

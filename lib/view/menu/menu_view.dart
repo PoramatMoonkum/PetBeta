@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pettakecare/view/menu/PetOwner_view.dart';
+import 'package:pettakecare/view/menu/PetSitter_view.dart';
 
 class MenuView extends StatefulWidget {
   const MenuView({Key? key}) : super(key: key);
@@ -8,6 +10,16 @@ class MenuView extends StatefulWidget {
 }
 
 class _MenuViewState extends State<MenuView> {
+  void _navigateToDepositPage() { 
+    // ใส่โค้ดเพื่อนำไปยังหน้าที่ต้องการ
+    Navigator.push(context, MaterialPageRoute(builder: (context) => PetSitterView()));
+  }
+
+  void _navigateToPetOwnerPage() {
+    // ใส่โค้ดเพื่อนำไปยังหน้าที่ต้องการ
+    Navigator.push(context, MaterialPageRoute(builder: (context) => PetOwnerView()));
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -28,34 +40,40 @@ class _MenuViewState extends State<MenuView> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    width: media.width * 0.4,
-                    height: media.width * 0.4,
-                    color: Colors.blue,
-                    margin: EdgeInsets.all(20),
-                    child: Center(
-                      child: Text(
-                        "ผู้รับฝาก",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  GestureDetector(
+                    onTap: _navigateToDepositPage, // กำหนดฟังก์ชันเมื่อกด
+                    child: Container(
+                      width: media.width * 0.4,
+                      height: media.width * 0.4,
+                      color: Colors.blue,
+                      margin: EdgeInsets.all(20),
+                      child: Center(
+                        child: Text(
+                          "ผู้รับฝาก",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  Container(
-                    width: media.width * 0.4,
-                    height: media.width * 0.4,
-                    color: Colors.red,
-                    margin: EdgeInsets.all(20),
-                    child: Center(
-                      child: Text(
-                        "เจ้าของสัตว์เลี้ยง",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  GestureDetector(
+                    onTap: _navigateToPetOwnerPage, // กำหนดฟังก์ชันเมื่อกด
+                    child: Container(
+                      width: media.width * 0.4,
+                      height: media.width * 0.4,
+                      color: Colors.red,
+                      margin: EdgeInsets.all(20),
+                      child: Center(
+                        child: Text(
+                          "เจ้าของสัตว์เลี้ยง",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
