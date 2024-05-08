@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pettakecare/view/pay_view/checkout_view.dart';
 
 class MyOrderView extends StatefulWidget {
   const MyOrderView({Key? key}) : super(key: key);
@@ -52,6 +53,8 @@ class _MyOrderViewState extends State<MyOrderView> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
+                  Navigator.push(context,MaterialPageRoute(
+                    builder: (context) => CheckoutView()));
                   // ดำเนินการชำระเงินตามวิธีที่เลือก
                 },
                 child: Text("ชำระเงิน"),
