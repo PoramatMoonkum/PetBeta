@@ -17,6 +17,8 @@ class _PetOwnerViewState extends State<PetOwnerView> {
 
   int depositDays = 0;
 
+  bool isHomeCareSelected = true;
+
   void incrementDepositDays() {
     setState(() {
       depositDays++;
@@ -206,24 +208,24 @@ class _PetOwnerViewState extends State<PetOwnerView> {
                         : Colors.green,
                   ),
                   ChoiceChip(
-                    label: Text('พื้นที่สำหรับหมา '),
-                    selected: selectedTags.contains('พื้นที่สำหรับหมา '),
+                    label: Text('พื้นที่สำหรับหมา'),
+                    selected: selectedTags.contains('พื้นที่สำหรับหมา'),
                     onSelected: (isSelected) {
                       setState(() {
                         if (isSelected) {
-                          selectedTags.add('พื้นที่สำหรับหมา ');
+                          selectedTags.add('พื้นที่สำหรับหมา');
                         } else {
-                          selectedTags.remove('พื้นที่สำหรับหมา ');
+                          selectedTags.remove('พื้นที่สำหรับหมา');
                         }
                       });
                     },
                     selectedColor: Colors.green,
                     labelStyle: TextStyle(
-                      color: selectedTags.contains('พื้นที่สำหรับหมา ')
+                      color: selectedTags.contains('พื้นที่สำหรับหมา')
                           ? Colors.black
                           : Colors.white,
                     ),
-                    backgroundColor: selectedTags.contains('พื้นที่สำหรับหมา ')
+                    backgroundColor: selectedTags.contains('พื้นที่สำหรับหมา')
                         ? Colors.white
                         : Colors.green,
                   ),
@@ -295,13 +297,41 @@ class _PetOwnerViewState extends State<PetOwnerView> {
                   ),
                 ],
               ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        isHomeCareSelected = true; // กำหนดให้เลือก "ดูแลที่บ้าน"
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: isHomeCareSelected ? Colors.green : Colors.grey,
+                    ),
+                    child: Text('ดูแลที่บ้าน'),
+                  ),
+                  SizedBox(width: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        isHomeCareSelected = false; // กำหนดให้เลือก "ฝากผู้ดูแล"
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: !isHomeCareSelected ? Colors.green : Colors.grey,
+                    ),
+                    child: Text('ฝากผู้ดูแล'),
+                  ),
+                ],
+              ),
               RoundButton(title: "ค้นหาผู้รับฝาก", onPressed: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MyOrderView(),
-                    ),
-                  );
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyOrderView(),
+                  ),
+                );
               }),
             ],
           ),

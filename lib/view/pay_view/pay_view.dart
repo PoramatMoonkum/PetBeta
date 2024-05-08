@@ -49,6 +49,13 @@ class _MyOrderViewState extends State<MyOrderView> {
                   });
                 },
               ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  // ดำเนินการชำระเงินตามวิธีที่เลือก
+                },
+                child: Text("ชำระเงิน"),
+              ),
             ],
           ),
         ),
