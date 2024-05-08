@@ -13,22 +13,30 @@ class _MenuViewState extends State<PetSitterView> {
     var media = MediaQuery.of(context).size;
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                "assets/img/app_logo.png",
-                width: media.width * 0.55,
-                height: media.width * 0.55,
-                fit: BoxFit.contain,
-              ),
-            ],
-          ),
-        ),
+      appBar: AppBar(
+        title: Text("Pet Sitter"),
+        leading: BackButton(),
+        backgroundColor: Colors.orange,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
       ),
+      body: Stack(alignment: Alignment.center, children: [
+        Image.asset(
+          "assets/img/splash_bg.png",
+          width: media.width,
+          height: media.height,
+          fit: BoxFit.cover,
+        ),
+        Image.asset(
+          "assets/img/pr.jpg",
+          width: media.width * 0.55,
+          height: media.width * 0.55,
+          fit: BoxFit.contain,
+        ),
+      ]
+    ),
     );
  
-}
+} 
 } 
