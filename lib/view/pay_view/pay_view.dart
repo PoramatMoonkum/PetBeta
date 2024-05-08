@@ -1,47 +1,60 @@
 import 'package:flutter/material.dart';
 
-class PayView extends StatefulWidget {
-  const PayView({Key? key}) : super(key: key);
+class MyOrderView extends StatefulWidget {
+  const MyOrderView({Key? key}) : super(key: key);
 
   @override
-  State<PayView> createState() => _MenuViewState();
+  State<MyOrderView> createState() => _MyOrderViewState();
 }
 
-class _MenuViewState extends State<PayView> {
+class _MyOrderViewState extends State<MyOrderView> {
+  PaymentMethod selectedPaymentMethod = PaymentMethod.QRCode;
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
 
     return Scaffold(
-      body: SingleChildScrollView(
+      appBar: AppBar(
+        title: Text("Payment"),
+        leading: BackButton(),
+        backgroundColor: Colors.orange,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(8.0),
         child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(
-                height: 30,
+              SizedBox(height: 40,),
+              RadioListTile<PaymentMethod>(
+                title: const Text('QR Code'),
+                value: PaymentMethod.QRCode,
+                groupValue: selectedPaymentMethod,
+                onChanged: (PaymentMethod? value) {
+                  setState(() {
+                    selectedPaymentMethod = value!;
+                  });
+                },
               ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.orange,
-                  borderRadius: BorderRadius.circular(media.width * 0.2),
-                ),
-                child: Center(
-                  child: Text(
-                    "ชำระเงิน",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+              RadioListTile<PaymentMethod>(
+                title: const Text('PayPal'),
+                value: PaymentMethod.paypal,
+                groupValue: selectedPaymentMethod,
+                onChanged: (PaymentMethod? value) {
+                  setState(() {
+                    selectedPaymentMethod = value!;
+                  });
+                },
               ),
             ],
           ),
         ),
       ),
     );
- 
+  }
 }
-} 
+
+enum PaymentMethod { QRCode, paypal, }

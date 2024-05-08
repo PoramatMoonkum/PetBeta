@@ -129,7 +129,7 @@ class _PetOwnerViewState extends State<PetOwnerView> {
                         }
                       });
                     },
-                    selectedColor: Colors.blue,
+                    selectedColor: Colors.green,
                     labelStyle: TextStyle(
                       color: selectedTags.contains('แมว')
                           ? Colors.black
@@ -137,7 +137,7 @@ class _PetOwnerViewState extends State<PetOwnerView> {
                     ),
                     backgroundColor: selectedTags.contains('แมว')
                         ? Colors.white
-                        : Colors.blue,
+                        : Colors.green,
                   ),
                   ChoiceChip(
                     label: Text('หมา'),
@@ -158,6 +158,116 @@ class _PetOwnerViewState extends State<PetOwnerView> {
                           : Colors.white,
                     ),
                     backgroundColor: selectedTags.contains('หมา')
+                        ? Colors.white
+                        : Colors.green,
+                  ),
+                  ChoiceChip(
+                    label: Text('คอนโดแมว'),
+                    selected: selectedTags.contains('คอนโดแมว'),
+                    onSelected: (isSelected) {
+                      setState(() {
+                        if (isSelected) {
+                          selectedTags.add('คอนโดแมว');
+                        } else {
+                          selectedTags.remove('คอนโดแมว');
+                        }
+                      });
+                    },
+                    selectedColor: Colors.green,
+                    labelStyle: TextStyle(
+                      color: selectedTags.contains('คอนโดแมว')
+                          ? Colors.black
+                          : Colors.white,
+                    ),
+                    backgroundColor: selectedTags.contains('คอนโดแมว')
+                        ? Colors.white
+                        : Colors.green,
+                  ),
+                  ChoiceChip(
+                    label: Text('น้ำพุแมว'),
+                    selected: selectedTags.contains('น้ำพุแมว'),
+                    onSelected: (isSelected) {
+                      setState(() {
+                        if (isSelected) {
+                          selectedTags.add('น้ำพุแมว');
+                        } else {
+                          selectedTags.remove('น้ำพุแมว');
+                        }
+                      });
+                    },
+                    selectedColor: Colors.green,
+                    labelStyle: TextStyle(
+                      color: selectedTags.contains('น้ำพุแมว')
+                          ? Colors.black
+                          : Colors.white,
+                    ),
+                    backgroundColor: selectedTags.contains('น้ำพุแมว')
+                        ? Colors.white
+                        : Colors.green,
+                  ),
+                  ChoiceChip(
+                    label: Text('พื้นที่สำหรับหมา '),
+                    selected: selectedTags.contains('พื้นที่สำหรับหมา '),
+                    onSelected: (isSelected) {
+                      setState(() {
+                        if (isSelected) {
+                          selectedTags.add('พื้นที่สำหรับหมา ');
+                        } else {
+                          selectedTags.remove('พื้นที่สำหรับหมา ');
+                        }
+                      });
+                    },
+                    selectedColor: Colors.green,
+                    labelStyle: TextStyle(
+                      color: selectedTags.contains('พื้นที่สำหรับหมา ')
+                          ? Colors.black
+                          : Colors.white,
+                    ),
+                    backgroundColor: selectedTags.contains('พื้นที่สำหรับหมา ')
+                        ? Colors.white
+                        : Colors.green,
+                  ),
+                  ChoiceChip(
+                    label: Text('หอพัก'),
+                    selected: selectedTags.contains('หอพัก'),
+                    onSelected: (isSelected) {
+                      setState(() {
+                        if (isSelected) {
+                          selectedTags.add('หอพัก');
+                        } else {
+                          selectedTags.remove('หอพัก');
+                        }
+                      });
+                    },
+                    selectedColor: Colors.green,
+                    labelStyle: TextStyle(
+                      color: selectedTags.contains('หอพัก')
+                          ? Colors.black
+                          : Colors.white,
+                    ),
+                    backgroundColor: selectedTags.contains('หอพัก')
+                        ? Colors.white
+                        : Colors.green,
+                  ),
+                   ChoiceChip(
+                    label: Text('บ้าน'),
+                    selected: selectedTags.contains('บ้าน'),
+                    onSelected: (isSelected) {
+                      setState(() {
+                        if (isSelected) {
+                          selectedTags.add('บ้าน');
+                        } else {
+                          selectedTags.remove('บ้าน');
+                        }
+                      });
+                    },
+                    selectedColor: Colors.green,
+                    labelStyle: TextStyle(
+                      color: selectedTags.contains('บ้าน')
+                          ? Colors.black
+                          : Colors.white,
+                    ),
+                    backgroundColor: selectedTags.contains('บ้าน')
                         ? Colors.white
                         : Colors.green,
                   ),
@@ -189,7 +299,7 @@ class _PetOwnerViewState extends State<PetOwnerView> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => PayView(),
+                      builder: (context) => MyOrderView(),
                     ),
                   );
               }),
