@@ -78,7 +78,7 @@ class _MainTabViewState extends State<MainTabView> {
                     onTap: () {
                       if (selctTab != 1) {
                         selctTab = 1;
-                        selectPageView = const CardUser();
+                        selectPageView = const ChatView();
                       }
                       if (mounted) {
                         setState(() {});

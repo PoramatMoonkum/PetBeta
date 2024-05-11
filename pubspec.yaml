@@ -57,6 +57,7 @@ dependencies:
   simple_animations: ^5.0.2
   page_transition: ^2.1.0
   chips_choice_null_safety: ^2.0.6
+  connectivity: ^3.0.6
 
 flutter_icons:
   android: true
