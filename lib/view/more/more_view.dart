@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:pettakecare/common/color_extension.dart';
 import 'package:pettakecare/view/login/login_view.dart';
+import 'package:pettakecare/view/more/notifications.dart';
 
 class MoreView extends StatefulWidget {
   const MoreView({super.key});
@@ -85,7 +86,7 @@ class _MoreViewState extends State<MoreView> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => Container()));
+                                builder: (context) => const NotificationsView()));
                       },
                       icon: Image.asset(
                         "assets/img/more_notification.png",
