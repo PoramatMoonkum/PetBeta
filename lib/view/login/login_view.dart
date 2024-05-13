@@ -2,7 +2,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+// import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:pettakecare/common/color_extension.dart';
 import 'package:pettakecare/common_widget/round_button.dart';
@@ -58,17 +58,17 @@ class _LoginViewState extends State<LoginView> {
     return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
-  Future<UserCredential> signInWithFacebook() async {
-    // Trigger the sign-in flow
-    final LoginResult loginResult = await FacebookAuth.instance.login();
+  // Future<UserCredential> signInWithFacebook() async {
+  //   // Trigger the sign-in flow
+  //   final LoginResult loginResult = await FacebookAuth.instance.login();
 
-    // Create a credential from the access token
-    final OAuthCredential facebookAuthCredential =
-        FacebookAuthProvider.credential(loginResult.accessToken!.token);
+  //   // Create a credential from the access token
+  //   final OAuthCredential facebookAuthCredential =
+  //       FacebookAuthProvider.credential(loginResult.accessToken!.token);
 
-    // Once signed in, return the UserCredential
-    return FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
-  }
+  //   // Once signed in, return the UserCredential
+  //   return FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -174,23 +174,23 @@ class _LoginViewState extends State<LoginView> {
               const SizedBox(
                 height: 30,
               ),
-              RoundIconButton(
-                icon: "assets/img/facebook_logo.png",
-                title: "Login with Facebook",
-                color: const Color(0xff367FC0),
-                onPressed: () async {
-                  UserCredential resultAccount = await signInWithFacebook();
-                  if (resultAccount.user != null) {
-                    print('Result Account: ${resultAccount.user}');
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const OnBoardingView(),
-                      ),
-                    );
-                  }
-                },
-              ),
+              // RoundIconButton(
+              //   icon: "assets/img/facebook_logo.png",
+              //   title: "Login with Facebook",
+              //   color: const Color(0xff367FC0),
+              //   onPressed: () async {
+              //     UserCredential resultAccount = await signInWithFacebook();
+              //     if (resultAccount.user != null) {
+              //       print('Result Account: ${resultAccount.user}');
+              //       Navigator.pushReplacement(
+              //         context,
+              //         MaterialPageRoute(
+              //           builder: (context) => const OnBoardingView(),
+              //         ),
+              //       );
+              //     }
+              //   },
+              // ),
               const SizedBox(
                 height: 25,
               ),

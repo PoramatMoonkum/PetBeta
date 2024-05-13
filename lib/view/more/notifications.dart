@@ -1,5 +1,10 @@
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pettakecare/view/card/card.dart';
+import 'package:pettakecare/view/card/match.dart';
 
 class NotificationsView extends StatefulWidget {
   const NotificationsView({Key? key}) : super(key: key);
@@ -12,6 +17,16 @@ class _NotificationsViewState extends State<NotificationsView> {
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
+    final notificaions = FirebaseFirestore.instance.collection('notifications');
+    final books = FirebaseFirestore.instance.collection('books');
+    final currentUser = FirebaseAuth.instance.currentUser?.uid;
+
+    Future<void> _acceptBook(bookId) async {
+      await books.doc(bookId).update({
+        'status': 'matched',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    }
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -27,7 +42,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                   color: Colors.orange,
                   borderRadius: BorderRadius.circular(media.width * 0.2),
                 ),
-                child: Center(
+                child: const Center(
                   child: Text(
                     "แจ้งเตือน",
                     style: TextStyle(
@@ -41,16 +56,40 @@ class _NotificationsViewState extends State<NotificationsView> {
               const SizedBox(
                 height: 20,
               ),
-              PetSitterCard(
-                imageUrl: 'https://www.google.com/search?sca_esv=ce5211ae4c407a08&sca_upv=1&q=cat&uds=ADvngMhum2KpuLWKZLPgcW2PAu-93I3xSYCbV07vKNjdocA6hPAcsXoeYigTKfmM_80-UXGLr1mXNlCtIGX8a99NmvoW0yn0wn46bA6ooi1Owt7SYztM5PfCKR2eMcd1j6ddE-LLmhCKPxQ4rLKiyDex9ZJpibFbR7JTAZWlNVmFlRO0KCagrihSwLSBPTCwmwFGxthnvXNUQrFN9HWKrAgXCe3cmztDZF-kDcn-4RPuwKfETlHi2RM3GAuH7dLhIaoQRi2GxtoU4e2mY5cqAFjl2CeesuipgA&udm=2&prmd=ivsnmbtz&sa=X&ved=2ahUKEwiChu-7nP2FAxXyZmwGHbPPBfwQtKgLegQIDRAB&biw=1488&bih=742&dpr=1.25#vhid=Wt17bybNg2aFGM&vssid=mosaic',
-                name: 'John Doe',
-                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-                onAcceptChanged: (accepted) {
-                  if (accepted) {
-                    // กระทำเมื่อตกลง
-                  } else {
-                    // กระทำเมื่อปฏิเสธ
+              StreamBuilder(
+                stream: notificaions
+                    .where('user_id', isEqualTo: currentUser)
+                    .where('read', isEqualTo: false)
+                    .snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasError) {}
+
+                  List<Widget> items = [];
+
+                  for (var item in snapshot.data!.docs.toList()) {
+                    if (item.get('type') == 'booking') {
+                      items.add(BookingCard(
+                          bookId: item.get('extras')['book_id'].toString(),
+                          onAcceptChanged: (accepted) async {
+                            if (accepted) {
+                              // call accept function and redirect to list page
+                              await _acceptBook(
+                                  item.get('extras')['book_id'].toString());
+                            }
+                            // mark as read
+                            notificaions.doc(item.id).update({'read': true});
+                          }));
+                    }
                   }
+
+                  if (items.length == 0) {
+                    items.add(Container());
+                  }
+
+                  return Column(
+                    children: items,
+                  );
                 },
               ),
             ],

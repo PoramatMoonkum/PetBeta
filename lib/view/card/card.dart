@@ -46,18 +46,18 @@ class PetSitterCard extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () {
                         if (onAcceptChanged != null) {
-                          onAcceptChanged!(true);
-                        }
-                      },
-                      child: Text('ตกลง'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (onAcceptChanged != null) {
                           onAcceptChanged!(false);
                         }
                       },
                       child: Text('ปฏิเสธ'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (onAcceptChanged != null) {
+                          onAcceptChanged!(true);
+                        }
+                      },
+                      child: Text('ตกลง'),
                     ),
                   ],
                 ),

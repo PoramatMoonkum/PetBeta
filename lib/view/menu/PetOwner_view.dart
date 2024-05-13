@@ -1,27 +1,70 @@
+import 'dart:developer';
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:pettakecare/common_widget/round_button.dart';
 import 'package:pettakecare/common_widget/round_textfield.dart';
-import 'package:pettakecare/view/pay_view/pay_view.dart';
+import 'package:pettakecare/view/match/matching_view.dart';
+import 'package:uuid/uuid.dart';
 
 class PetOwnerView extends StatefulWidget {
-  const PetOwnerView({Key? key}) : super(key: key);
+  const PetOwnerView({super.key});
 
   @override
   State<PetOwnerView> createState() => _PetOwnerViewState();
 }
 
+class Option {
+  final String key;
+  final String label;
+  bool value;
+
+  Option(this.key, this.label, this.value);
+}
+
 class _PetOwnerViewState extends State<PetOwnerView> {
+  var uuid = Uuid();
+  final storageRef = FirebaseStorage.instance.ref();
   TextEditingController txtSearch = TextEditingController();
+  final ImagePicker picker = ImagePicker();
+  late XFile? image;
 
-  List<String> selectedTags = [];
+  Future<String> uploadFileFirebase(File file) async {
+    final imgRef = storageRef.child('images');
+    String fileName =
+        uuid.v4() + '.' + file.path.split('.')[file.path.split('.').length - 1];
+    final petRef = imgRef.child(fileName);
+    return (await petRef.putFile(file)).ref.getDownloadURL();
+  }
 
-  int depositDays = 0;
+  Map<String, Option> options = <String, Option>{
+    'cat': Option('cat', 'แมว', false),
+    'dog': Option('dog', 'หมา', false),
+    'condo': Option('condo', 'คอนโดแมว', false),
+    'fountain': Option('fountain', 'น้ำพุแมว', false),
+    'large': Option('large', 'พื้นที่สำหรับหมา', false),
+  };
 
+  int depositDays = 1;
   bool isHomeCareSelected = true;
+  Map<String, String> uploadImage = {
+    'url': 'assets/img/upload.png',
+    'type': 'asset'
+  };
 
   void incrementDepositDays() {
     setState(() {
       depositDays++;
+    });
+  }
+
+  void setUploadImage(newImage) {
+    setState(() {
+      uploadImage = newImage;
     });
   }
 
@@ -33,12 +76,66 @@ class _PetOwnerViewState extends State<PetOwnerView> {
     });
   }
 
+  Future<String?> _createBooking() async {
+    CollectionReference books = FirebaseFirestore.instance.collection('books');
+    String? currentUser = FirebaseAuth.instance.currentUser?.uid;
+
+    if (currentUser == null) {
+      return null;
+    }
+
+    DateTime currentTime = DateTime.now();
+    DateTime expirationTime = currentTime.add(Duration(minutes: 3));
+
+    try {
+      Map<String, Object>? data = {
+        'user_id': currentUser,
+        'day': depositDays,
+        'onsite': isHomeCareSelected,
+        'status': 'waiting',
+        'pet_name': txtSearch.value.text.toString(),
+        'pet_image': uploadImage['url'] ?? '',
+        'timestamp': FieldValue.serverTimestamp(),
+        'expiry': expirationTime,
+      };
+      data['options'] =
+          options.map<String, bool>((key, value) => MapEntry(key, value.value));
+      DocumentReference docRef = await books.add(data);
+      return docRef.id;
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error adding data to Firestore')),
+      );
+    }
+
+    return null;
+  }
+
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
 
+    // Widget imageWidget = Image.asset(
+    //   'assets/img/upload.png',
+    //   width: media.width * 0.5,
+    //   height: media.width * 0.3,
+    //   fit: BoxFit.contain,
+    // );
+
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Pet Owner"),
+        leading: BackButton(),
+        backgroundColor: Colors.orange,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
+          child: Form(
+        key: _formKey,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -54,9 +151,9 @@ class _PetOwnerViewState extends State<PetOwnerView> {
                   color: Colors.orange,
                   borderRadius: BorderRadius.circular(media.width * 0.2),
                 ),
-                child: Center(
+                child: const Center(
                   child: Text(
-                    "เจ้าของสัตว์เลี้ยง",
+                    "สัตว์เลี้ยง",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -68,20 +165,20 @@ class _PetOwnerViewState extends State<PetOwnerView> {
               const SizedBox(
                 height: 20,
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: RoundTextfield(
-                  hintText: "รายการ :",
-                  controller: txtSearch,
-                  left: Container(
-                    alignment: Alignment.center,
-                    width: 30,
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(horizontal: 20),
+              //   child: RoundTextfield(
+              //     hintText: "รายการ :",
+              //     controller: txtSearch,
+              //     left: Container(
+              //       alignment: Alignment.center,
+              //       width: 30,
+              //     ),
+              //   ),
+              // ),
+              // const SizedBox(
+              //   height: 20,
+              // ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: RoundTextfield(
@@ -96,12 +193,43 @@ class _PetOwnerViewState extends State<PetOwnerView> {
               const SizedBox(
                 height: 20,
               ),
+              InkWell(
+                onTap: () async {
+                  // log('work');
+                  final img =
+                      await picker.pickImage(source: ImageSource.gallery);
+                  // log('Read file ${img?.path}');
+                  try {
+                    final url = await uploadFileFirebase(File(img!.path));
+                    // log('Uploaded: ${url}');
+                    setUploadImage({'type': 'network', 'url': url});
+                  } catch (e) {
+                    log(e.toString());
+                  }
+                },
+                child: uploadImage['type'] == 'asset'
+                    ? Image.asset(
+                        uploadImage['url']!,
+                        width: media.width * 0.5,
+                        height: media.width * 0.3,
+                        fit: BoxFit.contain,
+                      )
+                    : Image.network(
+                        uploadImage['url']!,
+                        width: media.width * 0.5,
+                        height: media.width * 0.3,
+                        fit: BoxFit.contain,
+                      ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
               Container(
                 decoration: BoxDecoration(
                   color: Colors.orange,
                   borderRadius: BorderRadius.circular(media.width * 0.2),
                 ),
-                child: Center(
+                child: const Center(
                   child: Text(
                     "แท็กสื่อที่ต้องการ",
                     style: TextStyle(
@@ -116,184 +244,28 @@ class _PetOwnerViewState extends State<PetOwnerView> {
                 height: 20,
               ),
               Wrap(
-                spacing: 8.0,
-                runSpacing: 8.0,
-                children: <Widget>[
-                  ChoiceChip(
-                    label: Text('แมว'),
-                    selected: selectedTags.contains('แมว'),
-                    onSelected: (isSelected) {
-                      setState(() {
-                        if (isSelected) {
-                          selectedTags.add('แมว');
-                        } else {
-                          selectedTags.remove('แมว');
-                        }
-                      });
-                    },
-                    selectedColor: Colors.green,
-                    labelStyle: TextStyle(
-                      color: selectedTags.contains('แมว')
-                          ? Colors.black
-                          : Colors.white,
-                    ),
-                    backgroundColor: selectedTags.contains('แมว')
-                        ? Colors.white
-                        : Colors.green,
-                  ),
-                  ChoiceChip(
-                    label: Text('หมา'),
-                    selected: selectedTags.contains('หมา'),
-                    onSelected: (isSelected) {
-                      setState(() {
-                        if (isSelected) {
-                          selectedTags.add('หมา');
-                        } else {
-                          selectedTags.remove('หมา');
-                        }
-                      });
-                    },
-                    selectedColor: Colors.green,
-                    labelStyle: TextStyle(
-                      color: selectedTags.contains('หมา')
-                          ? Colors.black
-                          : Colors.white,
-                    ),
-                    backgroundColor: selectedTags.contains('หมา')
-                        ? Colors.white
-                        : Colors.green,
-                  ),
-                  ChoiceChip(
-                    label: Text('คอนโดแมว'),
-                    selected: selectedTags.contains('คอนโดแมว'),
-                    onSelected: (isSelected) {
-                      setState(() {
-                        if (isSelected) {
-                          selectedTags.add('คอนโดแมว');
-                        } else {
-                          selectedTags.remove('คอนโดแมว');
-                        }
-                      });
-                    },
-                    selectedColor: Colors.green,
-                    labelStyle: TextStyle(
-                      color: selectedTags.contains('คอนโดแมว')
-                          ? Colors.black
-                          : Colors.white,
-                    ),
-                    backgroundColor: selectedTags.contains('คอนโดแมว')
-                        ? Colors.white
-                        : Colors.green,
-                  ),
-                  ChoiceChip(
-                    label: Text('น้ำพุแมว'),
-                    selected: selectedTags.contains('น้ำพุแมว'),
-                    onSelected: (isSelected) {
-                      setState(() {
-                        if (isSelected) {
-                          selectedTags.add('น้ำพุแมว');
-                        } else {
-                          selectedTags.remove('น้ำพุแมว');
-                        }
-                      });
-                    },
-                    selectedColor: Colors.green,
-                    labelStyle: TextStyle(
-                      color: selectedTags.contains('น้ำพุแมว')
-                          ? Colors.black
-                          : Colors.white,
-                    ),
-                    backgroundColor: selectedTags.contains('น้ำพุแมว')
-                        ? Colors.white
-                        : Colors.green,
-                  ),
-                  ChoiceChip(
-                    label: Text('พื้นที่สำหรับหมา'),
-                    selected: selectedTags.contains('พื้นที่สำหรับหมา'),
-                    onSelected: (isSelected) {
-                      setState(() {
-                        if (isSelected) {
-                          selectedTags.add('พื้นที่สำหรับหมา');
-                        } else {
-                          selectedTags.remove('พื้นที่สำหรับหมา');
-                        }
-                      });
-                    },
-                    selectedColor: Colors.green,
-                    labelStyle: TextStyle(
-                      color: selectedTags.contains('พื้นที่สำหรับหมา')
-                          ? Colors.black
-                          : Colors.white,
-                    ),
-                    backgroundColor: selectedTags.contains('พื้นที่สำหรับหมา')
-                        ? Colors.white
-                        : Colors.green,
-                  ),
-                  ChoiceChip(
-                    label: Text('หอพัก'),
-                    selected: selectedTags.contains('หอพัก'),
-                    onSelected: (isSelected) {
-                      setState(() {
-                        if (isSelected) {
-                          selectedTags.add('หอพัก');
-                        } else {
-                          selectedTags.remove('หอพัก');
-                        }
-                      });
-                    },
-                    selectedColor: Colors.green,
-                    labelStyle: TextStyle(
-                      color: selectedTags.contains('หอพัก')
-                          ? Colors.black
-                          : Colors.white,
-                    ),
-                    backgroundColor: selectedTags.contains('หอพัก')
-                        ? Colors.white
-                        : Colors.green,
-                  ),
-                   ChoiceChip(
-                    label: Text('บ้าน'),
-                    selected: selectedTags.contains('บ้าน'),
-                    onSelected: (isSelected) {
-                      setState(() {
-                        if (isSelected) {
-                          selectedTags.add('บ้าน');
-                        } else {
-                          selectedTags.remove('บ้าน');
-                        }
-                      });
-                    },
-                    selectedColor: Colors.green,
-                    labelStyle: TextStyle(
-                      color: selectedTags.contains('บ้าน')
-                          ? Colors.black
-                          : Colors.white,
-                    ),
-                    backgroundColor: selectedTags.contains('บ้าน')
-                        ? Colors.white
-                        : Colors.green,
-                  ),
-                ],
-              ),
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: createOptionWidget(options)),
               const SizedBox(
                 height: 20,
               ),
               Text(
                 'ฝากกี่วัน: $depositDays',
-                style: TextStyle(fontSize: 18),
+                style: const TextStyle(fontSize: 18),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ElevatedButton(
-                    onPressed: incrementDepositDays,
-                    child: Icon(Icons.add),
-                  ),
-                  SizedBox(width: 20),
                   ElevatedButton(
                     onPressed: decrementDepositDays,
-                    child: Icon(Icons.remove),
+                    child: const Icon(Icons.remove),
+                  ),
+                  const SizedBox(width: 20),
+                  ElevatedButton(
+                    onPressed: incrementDepositDays,
+                    child: const Icon(Icons.add),
                   ),
                 ],
               ),
@@ -303,40 +275,75 @@ class _PetOwnerViewState extends State<PetOwnerView> {
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
-                        isHomeCareSelected = true; // กำหนดให้เลือก "ดูแลที่บ้าน"
+                        isHomeCareSelected =
+                            true; // กำหนดให้เลือก "ดูแลที่บ้าน"
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: isHomeCareSelected ? Colors.green : Colors.grey,
+                      backgroundColor:
+                          isHomeCareSelected ? Colors.green : Colors.grey,
                     ),
-                    child: Text('ดูแลที่บ้าน'),
+                    child: const Text('ดูแลที่บ้าน'),
                   ),
-                  SizedBox(width: 20),
+                  const SizedBox(width: 20),
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
-                        isHomeCareSelected = false; // กำหนดให้เลือก "ฝากผู้ดูแล"
+                        isHomeCareSelected =
+                            false; // กำหนดให้เลือก "ฝากผู้ดูแล"
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: !isHomeCareSelected ? Colors.green : Colors.grey,
+                      backgroundColor:
+                          !isHomeCareSelected ? Colors.green : Colors.grey,
                     ),
-                    child: Text('ฝากผู้ดูแล'),
+                    child: const Text('ฝากผู้ดูแล'),
                   ),
                 ],
               ),
-              RoundButton(title: "ค้นหาผู้รับฝาก", onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MyOrderView(),
-                  ),
-                );
-              }),
+              RoundButton(
+                  title: "ค้นหาผู้รับฝาก",
+                  onPressed: () async {
+                    String? bookId = await _createBooking();
+                    if (bookId == null) {
+                      return;
+                    }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MatchingView(
+                          bookId: bookId,
+                        ),
+                      ),
+                    );
+                  }),
             ],
           ),
         ),
-      ),
+      )),
     );
+  }
+
+  List<Widget> createOptionWidget(Map<String, Option> options) {
+    List<Widget> list = [];
+    options.forEach((key, option) {
+      list.add(
+        ChoiceChip(
+          label: Text(option.label),
+          selected: option.value,
+          onSelected: (isSelected) {
+            setState(() {
+              option.value = !option.value;
+            });
+          },
+          selectedColor: Colors.green,
+          labelStyle: TextStyle(
+            color: option.value ? Colors.black : Colors.white,
+          ),
+          backgroundColor: option.value ? Colors.white : Colors.green,
+        ),
+      );
+    });
+    return list;
   }
 }
