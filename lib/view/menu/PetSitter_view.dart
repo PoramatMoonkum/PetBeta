@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pettakecare/common_widget/notification.dart';
-import 'package:pettakecare/view/more/notifications.dart';
-import 'package:pettakecare/view/pay_view/payment_view.dart';
 
 class PetSitterView extends StatefulWidget {
   const PetSitterView({Key? key}) : super(key: key);
@@ -14,12 +12,6 @@ class _MenuViewState extends State<PetSitterView> {
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
-
-    return const Scaffold(
-      body: PaymentView(
-        bookId: 'pGWIOlxR1K9VjMMEZXPS',
-      ),
-    );
 
     return Scaffold(
       appBar: AppBar(
