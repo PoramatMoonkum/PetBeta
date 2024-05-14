@@ -6,6 +6,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pettakecare/common/consts.dart';
 import 'package:pettakecare/view/pay_view/payment_view.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class MatchingView extends StatefulWidget {
   // const MatchingView({super.key, required this.selectedTags});
@@ -64,6 +66,14 @@ class _MenuViewState extends State<MatchingView> {
 
     if (book?['status'] == 'matched') {
       timer?.cancel();
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PaymentView(
+            bookId: bookId,
+          ),
+        ),
+      );
     }
 
     // log('book: ${book.toString()}');
@@ -109,7 +119,12 @@ class _MenuViewState extends State<MatchingView> {
         continue;
       }
 
-      await books.doc(bookId).update({'sitter_id': element['user_id']});
+      final sitter =
+          await sitters.where('user_id', isEqualTo: element['user_id']).get();
+      await books.doc(bookId).update({
+        'sitter': sitter.docs.take(1).first.reference,
+        'sitter_id': element['user_id']
+      });
 
       // send to sitters
       await notifications.add({
@@ -193,26 +208,61 @@ class _MenuViewState extends State<MatchingView> {
           centerTitle: true,
         ),
         body: SingleChildScrollView(
-          child: StreamBuilder<DocumentSnapshot>(
-              stream: books.doc(bookId).snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  var data = snapshot.data!.get('status');
-                  // log('Status: ${data}');
-                  if (data != null && data == 'matched') {
-                    timer?.cancel();
-                    return PaymentView(bookId: bookId);
-                  }
-                }
-                return Column(
-                  children: <Widget>[
-                    Image.asset(
-                      "assets/img/app_logo.png",
-                      width: media.width * 0.55,
-                      height: media.width * 0.55,
-                      fit: BoxFit.contain,
-                    ),
-                    Container(
+            child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Image.asset(
+              "assets/img/app_logo.png",
+              width: media.width * 0.55,
+              height: media.width * 0.55,
+              fit: BoxFit.contain,
+            ),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              StreamBuilder<DocumentSnapshot>(
+                  stream: books.doc(bookId).snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      var data = snapshot.data!.get('status');
+                      // log('Status: ${data}');
+                      if (data != null && data == 'matched') {
+                        timer?.cancel();
+                        return Column(
+                          children: [
+                            const Text(
+                              'พบผู้รับเลี้ยงแล้ว...',
+                              style: TextStyle(fontSize: 36),
+                            ),
+                            PopScope(
+                                canPop: false,
+                                onPopInvoked: (bool didPop) {
+                                  if (didPop) {
+                                    return;
+                                  }
+                                  _showBackDialog(bookId);
+                                },
+                                child: ElevatedButton(
+                                  onPressed: () => {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => PaymentView(
+                                          bookId: bookId,
+                                        ),
+                                      ),
+                                    )
+                                  },
+                                  style: ButtonStyle(
+                                      foregroundColor:
+                                          MaterialStateProperty.all(
+                                              Colors.red)),
+                                  child: const Text('ไปหน้าจ่ายเงิน'),
+                                )),
+                          ],
+                        );
+                      }
+                    }
+
+                    return Container(
                       alignment: Alignment.center,
                       margin: const EdgeInsets.only(top: 100),
                       child: Column(
@@ -239,10 +289,10 @@ class _MenuViewState extends State<MatchingView> {
                               )),
                         ],
                       ),
-                    ),
-                  ],
-                );
-              }),
-        ));
+                    );
+                  }),
+            ])
+          ],
+        )));
   }
 }

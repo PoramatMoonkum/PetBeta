@@ -11,7 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 enum Payment { promptpay, rabbit_linepay }
 
 class PaymentView extends StatefulWidget {
-  const PaymentView({required this.bookId});
+  const PaymentView({super.key, required this.bookId});
   final String? bookId;
 
   @override
@@ -32,11 +32,6 @@ class _MenuViewState extends State<PaymentView> {
   /// Get your public key on Omise Dashboard
   OmiseFlutter omiseClient = OmiseFlutter(OMISE_PUBLIC_KEY);
   OmiseFlutter omise = OmiseFlutter(OMISE_PRIVATE_KEY);
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -131,135 +126,138 @@ class _MenuViewState extends State<PaymentView> {
           elevation: 0,
           centerTitle: true,
         ),
-        body: FutureBuilder<DocumentSnapshot>(
+        body: SingleChildScrollView(
+            child: FutureBuilder<DocumentSnapshot>(
           future: books.doc(widget.bookId).get(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               log(snapshot.error.toString());
             }
-
-            if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasData) {
               final book = snapshot.data;
-              final sitterRef = book?.get('sitter') as DocumentReference?;
+
+              final sitterRef = book!.get('sitter') as DocumentReference?;
+
               return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   FutureBuilder<DocumentSnapshot>(
-                      future: sitterRef?.get(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasError) {
-                          log(snapshot.error.toString());
-                        }
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          final sitter = snapshot.data;
+                    future: sitterRef?.get(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        log(snapshot.error.toString());
+                      }
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        final sitter = snapshot.data;
+                        log('sitter: ${sitter.toString()}');
 
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 20, right: 20),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        'ผู้รับฝาก',
-                                        style: TextStyle(fontSize: 20),
-                                      ),
-                                      Row(
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(40),
-                                            child: Container(
-                                                width: 80,
-                                                height: 80,
-                                                color: Colors.blueGrey,
-                                                child: sitter
-                                                        ?.get('image')
-                                                        .startsWith('http')
-                                                    ? Image.network(
-                                                        sitter?.get('image') ??
-                                                            '',
-                                                        width: 120,
-                                                        height: 80,
-                                                        errorBuilder: (context,
-                                                            error, stackTrace) {
-                                                          return Image.asset(
-                                                            'assets/img/app_logo.png',
-                                                            width: 120,
-                                                            height: 80,
-                                                          );
-                                                        },
-                                                      )
-                                                    : Image.asset(
-                                                        'assets/img/app_logo.png')),
-                                          ),
-                                          Column(
-                                            children: [
-                                              // Text(book?.sitter?.name.toString() ?? ''),
-                                              ElevatedButton(
-                                                onPressed: () {},
-                                                style: ButtonStyle(
-                                                  side: MaterialStateProperty
-                                                      .all<BorderSide>(
-                                                    const BorderSide(
-                                                        color: Colors.orange,
-                                                        width: 2.0),
-                                                  ),
-                                                ),
-                                                child: const Text(
-                                                  'ดูโปรไฟล์',
-                                                  style: TextStyle(
-                                                      color: Colors.orange),
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 20, right: 20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'ผู้รับฝาก',
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                    Row(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(40),
+                                          child: Container(
+                                              width: 80,
+                                              height: 80,
+                                              color: Colors.blueGrey,
+                                              child: sitter
+                                                      ?.get('image')
+                                                      .startsWith('http')
+                                                  ? Image.network(
+                                                      sitter?.get('image') ??
+                                                          '',
+                                                      width: 120,
+                                                      height: 80,
+                                                      errorBuilder: (context,
+                                                          error, stackTrace) {
+                                                        return Image.asset(
+                                                          'assets/img/app_logo.png',
+                                                          width: 120,
+                                                          height: 80,
+                                                        );
+                                                      },
+                                                    )
+                                                  : Image.asset(
+                                                      'assets/img/app_logo.png',
+                                                      width: 120,
+                                                      height: 80,
+                                                    )),
+                                        ),
+                                        Column(
+                                          children: [
+                                            // Text(book?.sitter?.name.toString() ?? ''),
+                                            ElevatedButton(
+                                              onPressed: () {},
+                                              style: ButtonStyle(
+                                                side: MaterialStateProperty.all<
+                                                    BorderSide>(
+                                                  const BorderSide(
+                                                      color: Colors.orange,
+                                                      width: 2.0),
                                                 ),
                                               ),
-                                            ],
-                                          )
-                                        ],
-                                      )
-                                    ],
-                                  )),
-                              const Divider(),
-                              Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 20, right: 20),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      const Text(
-                                        'ที่อยู่',
-                                        style: TextStyle(fontSize: 20),
-                                      ),
-                                      Text(sitter?.get('address') ?? ''),
-                                    ],
-                                  )),
-                              const Divider(),
-                              const Padding(
-                                  padding: EdgeInsets.only(left: 20, right: 20),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'สัตว์เลี้ยง',
-                                        style: TextStyle(fontSize: 20),
-                                      ),
-                                    ],
-                                  )),
-                            ],
-                          );
-                        }
-                        return Container();
-                      }),
+                                              child: const Text(
+                                                'ดูโปรไฟล์',
+                                                style: TextStyle(
+                                                    color: Colors.orange),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                )),
+                            const Divider(),
+                            Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 20, right: 20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    const Text(
+                                      'ที่อยู่',
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                    Text(sitter?.get('address') ?? ''),
+                                  ],
+                                )),
+                            const Divider(),
+                            const Padding(
+                                padding: EdgeInsets.only(left: 20, right: 20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'สัตว์เลี้ยง',
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                  ],
+                                )),
+                          ],
+                        );
+                      }
+                      return Container();
+                    },
+                  ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      book?.get('pet_image').startsWith('http')
+                      book.get('pet_image').startsWith('http')
                           ? Image.network(
-                              book?.get('pet_image') ?? '',
+                              book.get('pet_image') ?? '',
                               width: 120,
                               height: 80,
                               errorBuilder: (context, error, stackTrace) {
@@ -270,7 +268,11 @@ class _MenuViewState extends State<PaymentView> {
                                 );
                               },
                             )
-                          : Image.asset('assets/img/app_logo.png'),
+                          : Image.asset(
+                              'assets/img/app_logo.png',
+                              width: 120,
+                              height: 80,
+                            ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -333,7 +335,6 @@ class _MenuViewState extends State<PaymentView> {
                               )
                             : Container(),
                   ),
-                  Spacer(),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -356,8 +357,8 @@ class _MenuViewState extends State<PaymentView> {
               );
             }
 
-            return Container();
+            return const Text('error');
           },
-        ));
+        )));
   }
 }
