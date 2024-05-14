@@ -1,15 +1,22 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:pettakecare/firebase_options.dart';
 import 'package:pettakecare/view/main_tabview/main_tabview.dart';
 import 'package:pettakecare/view/on_boarding/on_boarding_view.dart';
 import 'package:pettakecare/view/on_boarding/startup_view.dart';
+import 'package:flutter/foundation.dart';
 
 void main() async {
   // _initializeFirebase();
   WidgetsFlutterBinding
       .ensureInitialized(); // ensure that Flutter is initialized
+
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+    await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
+  }
+
   await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform); // initialize Firebase
   runApp(MyApp(defaultHome: StartupView()));

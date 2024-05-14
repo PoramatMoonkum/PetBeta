@@ -83,7 +83,8 @@ class _ProfileViewState extends State<ProfileView> {
               onTap: _updateProfilePicture,
               child: CircleAvatar(
                 radius: 50,
-                backgroundImage: _image != null ? FileImage(File(_image!.path)) : null,
+                backgroundImage:
+                    _image != null ? FileImage(File(_image!.path)) : null,
                 child: _image == null ? Icon(Icons.person, size: 50) : null,
               ),
             ),
@@ -109,15 +110,14 @@ class _ProfileViewState extends State<ProfileView> {
             ),
             SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: () async {
-                await _updateUserData();
-                // Show success message or navigate to another screen
-              },
-              child: Text('Save'),
-              style: ElevatedButton.styleFrom(
-                primary: Color(0xffFC6011),
-              )
-            ),
+                onPressed: () async {
+                  await _updateUserData();
+                  // Show success message or navigate to another screen
+                },
+                child: Text('Save'),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Color(0xffFC6011),
+                )),
           ],
         ),
       ),

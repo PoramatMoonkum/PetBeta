@@ -176,7 +176,7 @@ class _MenuViewState extends State<MatchingView> {
 
   @override
   Widget build(BuildContext context) {
-    var media = MediaQuery.of(context).size;
+    final media = MediaQuery.of(context).size;
     final bookId = widget.bookId;
 
     const spinkit = SpinKitPouringHourGlass(
@@ -201,7 +201,7 @@ class _MenuViewState extends State<MatchingView> {
                   // log('Status: ${data}');
                   if (data != null && data == 'matched') {
                     timer?.cancel();
-                    return const PaymentView();
+                    return PaymentView(bookId: bookId);
                   }
                 }
                 return Column(

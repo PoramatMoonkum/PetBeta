@@ -10,14 +10,16 @@ class MenuView extends StatefulWidget {
 }
 
 class _MenuViewState extends State<MenuView> {
-  void _navigateToDepositPage() { 
+  void _navigateToDepositPage() {
     // ใส่โค้ดเพื่อนำไปยังหน้าที่ต้องการ
-    Navigator.push(context, MaterialPageRoute(builder: (context) => PetSitterView()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => PetSitterView()));
   }
 
   void _navigateToPetOwnerPage() {
     // ใส่โค้ดเพื่อนำไปยังหน้าที่ต้องการ
-    Navigator.push(context, MaterialPageRoute(builder: (context) => PetOwnerView()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => PetOwnerView()));
   }
 
   @override

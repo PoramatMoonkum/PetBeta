@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CLIENT_ID</key>
+	<string>803956275515-7ir9r8v5buh0bll4rmbhsreghe0hq7k5.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.803956275515-7ir9r8v5buh0bll4rmbhsreghe0hq7k5</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>803956275515-5jlnomcnncoaj1l801hbogkfuco6nott.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyBGPQp6st5ozv-PEWEirQ2Pck-F3RdM2sc</string>
 	<key>GCM_SENDER_ID</key>
@@ -26,5 +32,7 @@
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
 	<string>1:803956275515:ios:352f30dc1d1d356befdf1e</string>
+	<key>DATABASE_URL</key>
+	<string>https://pettakecareremake-default-rtdb.asia-southeast1.firebasedatabase.app</string>
 </dict>
 </plist>

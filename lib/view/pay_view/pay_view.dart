@@ -29,7 +29,9 @@ class _MyOrderViewState extends State<MyOrderView> {
         child: Center(
           child: Column(
             children: [
-              SizedBox(height: 40,),
+              SizedBox(
+                height: 40,
+              ),
               RadioListTile<PaymentMethod>(
                 title: const Text('QR Code'),
                 value: PaymentMethod.QRCode,
@@ -53,8 +55,8 @@ class _MyOrderViewState extends State<MyOrderView> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.push(context,MaterialPageRoute(
-                    builder: (context) => CheckoutView()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => CheckoutView()));
                   // ดำเนินการชำระเงินตามวิธีที่เลือก
                 },
                 child: Text("ชำระเงิน"),
@@ -67,4 +69,7 @@ class _MyOrderViewState extends State<MyOrderView> {
   }
 }
 
-enum PaymentMethod { QRCode, paypal, }
+enum PaymentMethod {
+  QRCode,
+  paypal,
+}

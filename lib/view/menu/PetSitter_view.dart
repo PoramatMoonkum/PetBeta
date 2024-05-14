@@ -15,6 +15,12 @@ class _MenuViewState extends State<PetSitterView> {
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
 
+    return const Scaffold(
+      body: PaymentView(
+        bookId: 'pGWIOlxR1K9VjMMEZXPS',
+      ),
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Pet Sitter"),
