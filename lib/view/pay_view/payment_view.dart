@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:pettakecare/common/consts.dart';
+import 'package:pettakecare/view/home/home_view.dart';
 import 'package:pettakecare/view/pay_view/omise/omise.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -71,11 +72,16 @@ class _MenuViewState extends State<PaymentView> {
               context: context,
               type: QuickAlertType.success,
               text: 'ทำรายการสำเร็จ!',
-              title: 'สำเร็จ!');
+              title: 'สำเร็จ!',
+              onConfirmBtnTap: () {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            HomeView()), // TODO: หลังจากจ่ายเงินไปที่หน้าอื่น
+                    (route) => route.isFirst);
+              });
           t.cancel();
-          Future.delayed(Duration(seconds: 3), () {
-            Navigator.popUntil(context, (route) => route.isFirst);
-          });
         }
       });
     });
