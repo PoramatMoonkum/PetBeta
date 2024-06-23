@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:pettakecare/common/consts.dart';
@@ -22,6 +23,9 @@ class PaymentView extends StatefulWidget {
 
 class _MenuViewState extends State<PaymentView> {
   final books = FirebaseFirestore.instance.collection('books');
+  final users = FirebaseFirestore.instance.collection('users');
+  final settings = FirebaseFirestore.instance.collection('settings');
+
   // final notifications = FirebaseFirestore.instance.collection('notifications');
   final payments = FirebaseFirestore.instance.collection('payments');
 
@@ -52,16 +56,16 @@ class _MenuViewState extends State<PaymentView> {
     // https://www.omise.co/sources-api
     final source = await omise.source.create(
         (amount * 100), "THB", _payment.toString().split('.').last.toString());
-    log('source ${source.id}');
+    // log('source ${source.id}');
     final charge = await omise.charge.create(
         (amount * 100), "THB", source.id.toString(),
         returnUri: 'http://localhost');
 
-    // TODO: loop check status
-    timer = Timer.periodic(const Duration(seconds: 5), (Timer t) {
+    final point = (await (settings.doc('points')).get()).data()?['point'] ?? 0;
+
+    timer = Timer.periodic(const Duration(seconds: 3), (Timer t) {
       omise.charge.query(charge.id.toString()).then((charge) {
         if (charge.status == 'successful') {
-          //TODO: update payment status
           final payment = payments.add({
             'book_id': widget.bookId,
             'charge': charge.toJson(),
@@ -69,11 +73,23 @@ class _MenuViewState extends State<PaymentView> {
           books
               .doc(widget.bookId)
               .update({'status': 'paid', 'payment': payment});
+          final user = users.doc(FirebaseAuth.instance.currentUser!.uid);
+          user.get().then((value) {
+            if (value.data()!.containsKey('point')) {
+              user.update({
+                'point': FieldValue.increment(point),
+              });
+            } else {
+              user.update({
+                'point': point,
+              });
+            }
+          });
           QuickAlert.show(
               context: context,
               type: QuickAlertType.success,
-              text: 'ทำรายการสำเร็จ!',
-              title: 'สำเร็จ!',
+              text: 'สำเร็จ!',
+              title: 'คุณได้รับ $point คะแนน',
               onConfirmBtnTap: () {
                 Navigator.pushAndRemoveUntil(
                     context,
